@@ -1,0 +1,9 @@
+这是一个GIT的学习笔记
+我很懒，并不想写太多
+git remote add name htpps//***********    添加远程仓库地址，并且重命名成 name
+
+git renmote -v  			查看当前的远程仓库名字和地址
+
+git push name(名字) master(分支)	推送本地文件到远端仓库
+
+
