@@ -53,20 +53,23 @@ ADC按键
 电位计
 
 IO口列表
-舵机PWM PB9		TIM4-CH4
+舵机PWM PB9		TIM4-CH4	//已砍
 电机PWM	PB7		TIM4-CH2
 ADC按键	PA0		ADC0-0
 电位计	PA1		ADC0-1
 电压计	PA2		ADC0-2
 电流计	PA3		ADC0-3
 
-拉力传感器DAT	PA11
-拉力传感器SCK	PA12
+拉力传感器DAT	PA11	软件IO，随意调换
+拉力传感器SCK	PA12	软件IO，随意调换
 
-红外转速传感器	PB0		TIM3-CH3
+红外转速传感器	PB0		TIM3-CH3	
 
-OLED_SCL	PA5
-OLED_SDA	PA7
+OLED_SCL	PA5		软件IO，随意调换
+OLED_SDA	PA7		软件IO，随意调换
+
+MLX_SCL				软件IO，随意调换
+MLX_SDA				软件IO，随意调换
 
 BEEP	PA8 TIM1-CH1
 
