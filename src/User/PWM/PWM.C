@@ -30,7 +30,7 @@ void PWM_GPIO_INIT(void)
 
 }
 
-
+/*时钟频率不对啊*/
 void PWM_SET()
 {
 	TIM_TimeBaseInitTypeDef TIM_Base_SET;
@@ -40,7 +40,7 @@ void PWM_SET()
 	
 	peroid=1000000/fre;
 	
-	TIM_Base_SET.TIM_Prescaler	=	72;//时钟频率1M
+	TIM_Base_SET.TIM_Prescaler	=	7;//时钟频率1M
 	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
 	TIM_Base_SET.TIM_Period	=	peroid;
 	TIM_Base_SET.TIM_ClockDivision	=TIM_CKD_DIV1;	

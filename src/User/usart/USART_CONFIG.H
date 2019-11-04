@@ -17,7 +17,7 @@
 #define		USART2_TX_CATCH_LENGTH		128
 #define		USART2_RX_CATCH_LENGTH		128
 //串口波特率定义
-#define USART1_Rate 921600	
+#define USART1_Rate 115200	
 #define USART2_Rate 115200	
 
 

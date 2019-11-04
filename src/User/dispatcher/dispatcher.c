@@ -13,23 +13,23 @@
 
 /*FPS换算成ms*/
 #define	FPS(x)	(1000/x)	//不加浮点问题也不大
-/*
-调度函数
-*/
+
+
 
 uint8_t key_vaule_buff;
 extern uint8_t key_flag;
 extern uint8_t HX711_FLAG;//正在读取时为0
 extern output_data	out_data;
 
-extern uint16_t ADC_sourse[end];
-extern uint16_t ADC_Fliter[end];
+extern uint16_t ADC_sourse[4];
+extern uint16_t ADC_Fliter[4];
 volatile uint64_t sys_time=0;//系统总时间
 extern uint32_t set_zero;
 extern float GapValue;
 extern uint16_t step_t;
 extern  all_data data;
 
+extern uint16_t HX_weight;
 
 uint32_t sys_cycle=0;
 uint32_t task_time[10];//任务等待时间
@@ -80,11 +80,11 @@ void TaskInit()
 	Tick.OledRefreshTaskRemainTime	=	Tick.OLedRefreshTaskPerTime;
 	Tick.OledRefreshTask	=	&OLED_Refresh;
 	
-	Tick.KeyScanPer	=	FPS(100);//100hz按键扫描速度
+	Tick.KeyScanPer	=	FPS(1);//100hz按键扫描速度
 	Tick.KeyScanRemain	=	Tick.KeyScanPer;
 	Tick.KeyScanTask	=	&ScanKey;
 	
-	Tick.USARTranmitPer	=	FPS(100);//100hz刷新速度
+	Tick.USARTranmitPer	=	FPS(500);//100hz刷新速度
 	Tick.USARTransmitRemain	=	Tick.USARTranmitPer;
 	Tick.USARTranmit	=	&ANO_TransmitCallBack;
 	
@@ -145,7 +145,7 @@ void dispatcher(void)
 }
 
 /*
-任务触发过快就会被无视
+来不及触发的惹怒会被覆盖
 滤波次数尽可能的多，数据才能稳
 */
 void dispatcherMain()
@@ -158,14 +158,19 @@ void dispatcherMain()
 	LOWPASS();
 	parameter_cuc();
 	if((Read_DOUT==RESET)&&HX711_FLAG)//HX711准备好，且未开始读取
-	ADC_Fliter[weight]=get_wetght();
+	HX_weight=get_wetght();
 	
 	PWM1_Out_H(data.throttle);
+	
 	if(Tick.OledRefreshTaskRemainTime==Tick.OLedRefreshTaskPerTime)
 	(*Tick.OledRefreshTask)();
+	
 	if(Tick.USARTransmitRemain==Tick.USARTranmitPer )
 		(*Tick.USARTranmit)();	//发送数据
 	
+	/*
+	连续发送3个数据包后会出现200ms左右中断
+	*/
 	
 	
 	
@@ -180,11 +185,7 @@ void delay_ms(uint32_t ms)
 
 
 #endif
-//显示屏刷新任务，300ms执行一次
-void EDP_TASK()
-{
-	;
-}	
+
 //最长定时时间1.3s
 #if	0//USE_TIM6_DELAY
 

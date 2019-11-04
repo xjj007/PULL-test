@@ -17,25 +17,11 @@
 #include  "flash.h"
 
 //所有的功能开关在dispatcher.h里
-/*
-我们希望每一个页面都尽可能的有相同的操作逻辑
-同时，我们还希望每个页面能有自己的坐标
-自动测试
-手动测试
-舵机测试
-参数矫正
 
-先添加蜂鸣器支持
-
-
-不需要的代码直接删除就好了
-蓝牙通过设置页面配置，开机后默认蓝牙是正确的可以使用的
-
-*/
 
 uint8_t paint[1024]={0};//7行128列
-extern uint16_t ADC_sourse[end];
-extern uint16_t ADC_Fliter[end];
+extern uint16_t ADC_sourse[4];
+extern uint16_t ADC_Fliter[4];
 extern uint8_t key_vaule_buff;
 extern uint16_t current_offset;//电流计偏移量
 
@@ -58,13 +44,13 @@ int main()
 #endif	/*USE_FLASH*/
 	
 	
-	beep_set();
+	beep_set();		//现在并不建议使用蜂鸣器
 	ADCx_Init();
 	HX711_SET();
 	PWM_SET();
 	Low_Pass_init();
 	HX711set_to_0();
-	OLED_Init();//硬件初始化7
+	OLED_Init();//硬件初始化
 	UIinit();
 	REV_Config();
 
@@ -75,22 +61,8 @@ int main()
 	dispatcher_set();//72M主频下 1000hz
 	TaskInit();
 	
-	
-#ifdef PWM_TEST
-	//PWM1_Enable();
-	PWM1OutPut(50);
-	while(1);
-#endif	/*PWM_TEST*/
 
-#ifdef KEY_TEST
-	if(KEY_Pass()>600)
-			{
-			delay_ms(10);
-				key_vaule_buff=key_vaule();
-			}  
-			else
-				key_vaule_buff=0;
-#endif	/*KEY_TEST*/
+
 	
 	while(1)
 	{

@@ -6,15 +6,15 @@
 #include	"fliter.h"
 
 extern uint8_t key_vaule_buff;
-uint16_t ADC_sourse[end]={0,0,0,0,0};//外设传回的源数据(DMA自动传输的源数据)
-uint16_t ADC_Fliter[end]={0,0,0,0,0};//滤波后的数据(还没有经过单位转化)
+uint16_t ADC_sourse[4]={0,0,0,0};//外设传回的源数据(DMA自动传输的源数据)
+uint16_t ADC_Fliter[4]={0,0,0,0};//滤波后的数据(还没有经过单位转化)
 
-uint16_t voltage_offset=100;
-float  	 voltage_ratio=0.00806;
+uint16_t voltage_offset=85;
+float  	 voltage_ratio=0.008862;
 
 
-uint16_t current_offset=127;//电流计偏移量
-float	   current_ratio=0.01611328;//
+uint16_t current_offset=115;//电流计偏移量
+float	   current_ratio=0.015072;//这个计算可能会损失精度
 
 
 bool upKeyPress=false;
@@ -23,16 +23,9 @@ bool leftKeyPress=false;
 bool RightKeyPress=false;
 
 
-/*
-好难啊有效键值持续30ms就认为是有效按下，然后100ms 
-*/
 u8 key_effect	=	0;	//记录按键有效次数
 u8 OLD_KEY	=	no_key;	//上一次的按键键值
 
-/*
-设置标志位，需要什么直接设置
-不要怕麻烦
-*/
 
 /*
 这个需要写4个吗
@@ -211,28 +204,9 @@ uint8_t key_vaule()
 }
 
 //获取键值，按键扫描速度100hz
-/*
-由于换了结构，按键需要重新扫描
-*/
 
-
-
-
-/*
-必须经过时间来测量比如20ms，怎么记住这个时间呢
-也就是说，所有的按键都需要两级判断
-每10ms看一次
-按键未触发状态下
-连续两次都看到就算按键触发 
-
-
-换一种思路就是给按键加一个滤波器，滤波输出结果就是按键结果
-
-*/
 void ScanKey()
 {
-
-
 
 }
 

@@ -13,29 +13,16 @@
 #define	RCC_KEY_Periph	RCC_APB2Periph_ADC1
 
 
-enum ADC_Sourse		
+enum ADC_Sourse		//ADC 源
 {
-		KEY,
+		KEY=0,
 		poten,
 		BAT,
 		CUR,
-		weight,
-		end,
 };
 
 
-/*
-因为结构体难以通过循环的方法来处理数据
-因此，我吗决定用数组
-typedef struct 
-{
-	uint16_t KEY;						//按键
-	uint16_t potentiometer;	//电位器
-	uint16_t	BAT;					//电压
-	uint16_t	CUR;					//电流
 
-}ADC_sourse_dat;
-*/
 enum _key_vaule		//键值
 {	
 		no_key,

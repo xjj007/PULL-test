@@ -10,8 +10,8 @@
 #include	"flash.h"
 
 extern uint8_t key_vaule_buff;
-extern uint16_t ADC_Fliter[end];
-extern uint16_t ADC_sourse[end];
+extern uint16_t ADC_Fliter[4];
+extern uint16_t ADC_sourse[4];
 extern uint8_t key_flag;
 extern uint16_t current_offset;//电流计偏移量
 extern float	  current_ratio;

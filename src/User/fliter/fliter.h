@@ -23,6 +23,15 @@ enum a_lowpass		//低通滤波器的参数a
 	a_end,
 };
 
+enum Average_num	//均值滤波器
+{
+	A_KEY=0,
+	A_poten,
+	A_BAT,
+	A_CUR,
+	A_weight,
+	e_average_num,
+};
 
 typedef struct	{
 	float			current;	 //电流

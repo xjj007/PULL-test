@@ -10,6 +10,8 @@ uint8_t HX711_FLAG=1;
 //max pull=5kg=5000g
 //24bit ADC=16777216 128
 
+uint16_t HX_weight=0;
+
 
 void HX711_SET()
 {

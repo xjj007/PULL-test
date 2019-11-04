@@ -9,7 +9,7 @@
 /*
 屏幕刷新使用计划任务 15HZ或者30HZ
 */
-#define	OLED_FPS	10	//OLED刷新率
+#define	OLED_FPS	1	//OLED刷新率
 
 
 
