@@ -33,7 +33,6 @@ int main()
 	
 #ifdef USE_FLASH
 	uint16_t temp;
-	//FLASH_Status FLASHStatus = FLASH_COMPLETE;
 	FLASH_Unlock();	//½âËøflash
 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR 
 									| FLASH_FLAG_WRPRTERR);	

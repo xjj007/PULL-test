@@ -3,8 +3,11 @@
 
 #include	"PWM.H"
 
+
 uint16_t peroid;
 uint16_t fre=50;
+uint16_t beep_fre	=	5000;//单位HZ，取值20-20000
+uint16_t beep_Sound	=	0; //声音大小，0-10档		
 
 //uint16_t frequence	=	1/((float)peroid/100000);
  //uint16_t fre=1000000/peroid;
@@ -22,12 +25,12 @@ void PWM_GPIO_INIT(void)
 	GPIO_config.GPIO_Pin	=	GPIO_MOTOR_Pin;
 	GPIO_Init(MOTO_GPIO,&GPIO_config);
 	
-	GPIO_config.GPIO_Pin	=	GPIO_POTEN_Pin;
-	GPIO_Init(POTEN_GPIO,&GPIO_config);
+	//GPIO_config.GPIO_Pin	=	GPIO_POTEN_Pin;
+	//GPIO_Init(POTEN_GPIO,&GPIO_config);
 	
 	
 	GPIO_ResetBits(MOTO_GPIO,GPIO_MOTOR_Pin);
-	GPIO_ResetBits(POTEN_GPIO,GPIO_POTEN_Pin);
+	//GPIO_ResetBits(POTEN_GPIO,GPIO_POTEN_Pin);
 
 }
 
@@ -39,13 +42,12 @@ void PWM_GPIO_INIT(void)
 	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,ENABLE);
 	
-	peroid=1000000/fre;
+	peroid=1000000U/fre;
 	
 	TIM_Base_SET.TIM_Prescaler	=	72;//时钟频率1M
 	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
 	TIM_Base_SET.TIM_Period	=	peroid;
 	TIM_Base_SET.TIM_ClockDivision	=TIM_CKD_DIV1;	
-//	TIM_Base_SET.TIM_RepetitionCounter	=	
 	TIM_TimeBaseInit(TIM4,&TIM_Base_SET);
 	
 	TIM_OCSet.TIM_OCMode	=	TIM_OCMode_PWM1;
@@ -54,11 +56,8 @@ void PWM_GPIO_INIT(void)
 	TIM_OCSet.TIM_OCPolarity	=	TIM_OCPolarity_High;
 
 	TIM_OC2Init(TIM4,&TIM_OCSet);
-	TIM_OC4Init(TIM4,&TIM_OCSet);
+	//TIM_OC4Init(TIM4,&TIM_OCSet);
 	//PWM配置完毕后需要强制pwm输出为低
-	
-	//TIM_ForcedOC2Config(TIM4,TIM_ForcedAction_InActive);
-	//TIM_ForcedOC4Config(TIM4,TIM_ForcedAction_InActive);
 	
 	TIM_Cmd(TIM4, ENABLE);
 }
@@ -83,15 +82,16 @@ void beep_set()
 	GPIO_SetBits(beep_GPIO,beep_GPIO_Pin);
 	
 	/*20-20000hz*/
-	TIM_Base_SET.TIM_Prescaler		=	72;//时钟频率
+	TIM_Base_SET.TIM_Prescaler		=	Beep_TIM_Prescaler;//时钟频率
+	
 	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
-	TIM_Base_SET.TIM_Period			=	1000;//控制音调
+	TIM_Base_SET.TIM_Period			=	beep_TIM_Period;//控制音调
 	TIM_Base_SET.TIM_ClockDivision	=	TIM_CKD_DIV1;	
 	TIM_TimeBaseInit(TIM1,&TIM_Base_SET);
 	
 	TIM_OCSet.TIM_OCMode			=	TIM_OCMode_PWM1;
 	TIM_OCSet.TIM_OutputState		=	TIM_OutputState_Enable;
-	TIM_OCSet.TIM_Pulse				=	10001;//控制响度
+	TIM_OCSet.TIM_Pulse				=	beep_TIM_Pulse;//控制响度
 	TIM_OCSet.TIM_OCPolarity		=	TIM_OCPolarity_High;
 
 	TIM_OC1Init(TIM1,&TIM_OCSet);
