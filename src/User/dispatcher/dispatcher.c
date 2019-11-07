@@ -7,7 +7,7 @@
 #include	"HX711.H"
 #include	"USART_CONFIG.H"
 #include	"UI.H"
-
+#include	"rev.h"
 
 #define	USE_DSIPATCHER
 
@@ -30,6 +30,8 @@ extern uint16_t step_t;
 extern  all_data data;
 
 extern uint16_t HX_weight;
+
+extern uint16_t rmp;
 
 uint32_t sys_cycle=0;
 uint32_t task_time[10];//任务等待时间
@@ -125,13 +127,21 @@ void dispatcher_set()
 void dispatcher(void)
 {		
 	ANO.clock++;//应该赋予这个变量更正式的名字
-	if(ANO.clock==1000)
+	
+	/*每100ms读下电机的转速*/
+	if(ANO.clock%100==0)
 	{
+	rmp	=	get_rmp()*10/2;
+	}
+	if(ANO.clock==1000)
+	{	
+		
 		ANO.clock=0;
 		Tick.FliterFPS= Tick.FliterFPSCounter;
 		Tick.FliterFPSCounter	=	0;
 	}
-	if(Tick.delay>0 )Tick.delay--;
+	if(Tick.delay>0 )
+		Tick.delay--;
 	
 	if(Tick.OledRefreshTaskRemainTime>0) Tick.OledRefreshTaskRemainTime--;
 	else
@@ -180,6 +190,7 @@ void dispatcherMain()
 void delay_ms(uint32_t ms)
 {
 	Tick.delay	=	ms;
+
 	while(Tick.delay);
 }
 
@@ -209,48 +220,6 @@ void delay_ms(uint32_t ms)
 	delay_us(ms*1000);
 }
 #endif	/*USE_TIM6_DELAY*/
-
-
-/*配置定时器*/
-void TIM2_inti(uint16_t peroi)//串口 发送专用定时器
-{	
-	/*发送一次数据需要1.28ms，加上滤波数据采集，最小时间5ms
-	最大时间间隔*/
-	TIM_TimeBaseInitTypeDef TIM_Base_SET;
-	
-	if(peroi<50||peroi>1000)
-		return;
-	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);
-	
-	TIM_Base_SET.TIM_Prescaler	=	7200;//时钟频率1M
-	//TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
-	TIM_Base_SET.TIM_Period	=	peroi*10;
-	TIM_Base_SET.TIM_ClockDivision	=TIM_CKD_DIV1;	
-//	TIM_Base_SET.TIM_RepetitionCounter	=	
-	TIM_TimeBaseInit(TIM2,&TIM_Base_SET);
-	
-	TIM_Cmd(TIM2, DISABLE);
-}
-void TIM1_inti()//PWM步进定时
-{	/*发送一次数据需要1.28ms，加上滤波数据采集，最小时间5ms
-	最大时间间隔*/
-	TIM_TimeBaseInitTypeDef TIM_Base_SET;
-	
-	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);
-	
-	
-	TIM_Base_SET.TIM_Prescaler	=	7200;//时钟频率1M
-	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
-	TIM_Base_SET.TIM_Period	=	step_t*10;
-	TIM_Base_SET.TIM_ClockDivision	=TIM_CKD_DIV1;	
-//	TIM_Base_SET.TIM_RepetitionCounter	=	
-	TIM_TimeBaseInit(TIM1,&TIM_Base_SET);
-	
-	TIM_Cmd(TIM1, DISABLE);
-}
-
 
 #endif	/*DISPATCHER_H*/
 

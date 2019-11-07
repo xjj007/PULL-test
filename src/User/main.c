@@ -15,11 +15,14 @@
 #include  "fliter.h"
 #include  "PWM.H"
 #include  "flash.h"
+#include  "rev.h"
+#include  "temperature.h"
 
 //所有的功能开关在dispatcher.h里
+//内存不太够啊
+//要不然加个flash
 
-
-uint8_t paint[1024]={0};//7行128列
+uint8_t paint[1024]={0};	//7行128列
 extern uint16_t ADC_sourse[4];
 extern uint16_t ADC_Fliter[4];
 extern uint8_t key_vaule_buff;
@@ -30,7 +33,7 @@ int main()
 	
 #ifdef USE_FLASH
 	uint16_t temp;
-	FLASH_Status FLASHStatus = FLASH_COMPLETE;
+	//FLASH_Status FLASHStatus = FLASH_COMPLETE;
 	FLASH_Unlock();	//解锁flash
 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR 
 									| FLASH_FLAG_WRPRTERR);	
@@ -44,24 +47,23 @@ int main()
 #endif	/*USE_FLASH*/
 	
 	
-	beep_set();		//现在并不建议使用蜂鸣器
+	
 	ADCx_Init();
 	HX711_SET();
 	PWM_SET();
+	beep_set();		
 	Low_Pass_init();
 	HX711set_to_0();
-	OLED_Init();//硬件初始化
+	OLED_Init();
 	UIinit();
 	REV_Config();
-
-//	power_on();//显示开机页面
-//	delay_ms(800);
 	USART_config();//配置串口
-	//fliter_set();
 	dispatcher_set();//72M主频下 1000hz
 	TaskInit();
 	
-
+	MLX90614_Init();
+	
+	
 
 	
 	while(1)

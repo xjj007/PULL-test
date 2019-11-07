@@ -73,5 +73,6 @@ uint16_t KEY_Pass(void);
 uint16_t poten_Pass(void);
 void HighPass(void);
 void PWM1_Out_H(uint16_t vaule);
+void parameter_cuc(void);
 
 #endif	/*FLITER_H*/

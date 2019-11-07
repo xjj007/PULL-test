@@ -8,6 +8,7 @@
 #include	"fliter.h"
 #include	"PWM.H"
 #include	"flash.h"
+#include	"dispatcher.h"
 
 extern uint8_t key_vaule_buff;
 extern uint16_t ADC_Fliter[4];
@@ -1130,12 +1131,12 @@ void show_data(uint8_t mode)
 	uint16_t pwm=0;
 	count_down();
 	page2();
-	TIM2_inti(100);
-	TIM1_inti();
+	//TIM2_inti(100);
+	//TIM1_inti();
 	PWM1_Enable();
 	PWM1OutPut(0);
-	TIM_Cmd(TIM2, ENABLE);
-	TIM_Cmd(TIM1, ENABLE);
+	//TIM_Cmd(TIM2, ENABLE);
+	//TIM_Cmd(TIM1, ENABLE);
 	while(1)
 		{
 			LOWPASS();
@@ -1176,8 +1177,8 @@ void show_data(uint8_t mode)
 		{
 				case left:	//此处应该执行立刻停机
 				PWM1OutPut(0);
-				TIM_Cmd(TIM2, DISABLE);
-				TIM_Cmd(TIM1, DISABLE);
+				///TIM_Cmd(TIM2, DISABLE);
+				//TIM_Cmd(TIM1, DISABLE);
 				return;
 		}
 		delay_ms(1);
@@ -1220,7 +1221,7 @@ void fliter_set()
 	pageB();
 	show_float(32,0,a_parameter[a_cur],1,4,&Font8X16,UNCOLOR);
 	show_float(32,16,a_parameter[a_bat],1,4,&Font8X16,COLOR);
-	TIM2_inti(100);
+	//TIM2_inti(100);
 	TIM_Cmd(TIM2, ENABLE);
 	while(1)
 	{	

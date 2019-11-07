@@ -980,7 +980,7 @@ void TIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewSt
   }
 }
 
-/**
+/**配置内部时钟
   * @brief  Configures the TIMx internal Clock
   * @param  TIMx: where x can be  1, 2, 3, 4, 5, 8, 9, 12 or 15
   *         to select the TIM peripheral.
@@ -1016,7 +1016,7 @@ void TIM_ITRxExternalClockConfig(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSou
   TIMx->SMCR |= TIM_SlaveMode_External1;
 }
 
-/**
+/**			配置外部触发源时钟
   * @brief  Configures the TIMx Trigger as External Clock
   * @param  TIMx: where x can be  1, 2, 3, 4, 5, 9, 12 or 15 to select the TIM peripheral.
   * @param  TIM_TIxExternalCLKSource: Trigger source.
@@ -1211,7 +1211,7 @@ void TIM_CounterModeConfig(TIM_TypeDef* TIMx, uint16_t TIM_CounterMode)
   TIMx->CR1 = tmpcr1;
 }
 
-/**
+/**	选择输入触发
   * @brief  Selects the Input Trigger source
   * @param  TIMx: where x can be  1, 2, 3, 4, 5, 8, 9, 12 or 15 to select the TIM peripheral.
   * @param  TIM_InputTriggerSource: The Input Trigger source.
@@ -1242,7 +1242,7 @@ void TIM_SelectInputTrigger(TIM_TypeDef* TIMx, uint16_t TIM_InputTriggerSource)
   TIMx->SMCR = tmpsmcr;
 }
 
-/**
+/**配置编码器接口
   * @brief  Configures the TIMx Encoder Interface.
   * @param  TIMx: where x can be  1, 2, 3, 4, 5 or 8 to select the TIM peripheral.
   * @param  TIM_EncoderMode: specifies the TIMx Encoder Mode.

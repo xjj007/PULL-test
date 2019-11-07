@@ -121,7 +121,7 @@ typedef struct
   uint16_t TIM_ICPolarity;   /*!< Specifies the active edge of the input signal.
                                   This parameter can be a value of @ref TIM_Input_Capture_Polarity */
 
-  uint16_t TIM_ICSelection;  /*!< Specifies the input.
+  uint16_t TIM_ICSelection;  /*!< Specifies the input.	//Ö¸¶¨ÊäÈë
                                   This parameter can be a value of @ref TIM_Input_Capture_Selection */
 
   uint16_t TIM_ICPrescaler;  /*!< Specifies the Input Capture Prescaler.

@@ -1,7 +1,3 @@
-//we have two kinds of pwm output
-// 电机和电位器，设置两种PWM输入函数
-//需要用到输出时再设置
-/*还需要配置一路蜂鸣器*/
 #ifndef	PWM_C
 #define	PWM_C
 
@@ -9,6 +5,7 @@
 
 uint16_t peroid;
 uint16_t fre=50;
+
 //uint16_t frequence	=	1/((float)peroid/100000);
  //uint16_t fre=1000000/peroid;
 TIM_OCInitTypeDef	TIM_OCSet;
@@ -17,13 +14,17 @@ void PWM_GPIO_INIT(void)
 	GPIO_InitTypeDef GPIO_config;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 	
+	
 	GPIO_config.GPIO_Mode	=	GPIO_Mode_AF_PP;//复用推挽
 	GPIO_config.GPIO_Speed	=	GPIO_Speed_50MHz;
-	GPIO_config.GPIO_Pin	=	GPIO_MOTOR_Pin;
 	
+	
+	GPIO_config.GPIO_Pin	=	GPIO_MOTOR_Pin;
 	GPIO_Init(MOTO_GPIO,&GPIO_config);
+	
 	GPIO_config.GPIO_Pin	=	GPIO_POTEN_Pin;
 	GPIO_Init(POTEN_GPIO,&GPIO_config);
+	
 	
 	GPIO_ResetBits(MOTO_GPIO,GPIO_MOTOR_Pin);
 	GPIO_ResetBits(POTEN_GPIO,GPIO_POTEN_Pin);
@@ -31,7 +32,7 @@ void PWM_GPIO_INIT(void)
 }
 
 /*时钟频率不对啊*/
-void PWM_SET()
+ void PWM_SET()
 {
 	TIM_TimeBaseInitTypeDef TIM_Base_SET;
 	PWM_GPIO_INIT();
@@ -40,7 +41,7 @@ void PWM_SET()
 	
 	peroid=1000000/fre;
 	
-	TIM_Base_SET.TIM_Prescaler	=	7;//时钟频率1M
+	TIM_Base_SET.TIM_Prescaler	=	72;//时钟频率1M
 	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
 	TIM_Base_SET.TIM_Period	=	peroid;
 	TIM_Base_SET.TIM_ClockDivision	=TIM_CKD_DIV1;	
@@ -61,7 +62,45 @@ void PWM_SET()
 	
 	TIM_Cmd(TIM4, ENABLE);
 }
+/*
+蜂鸣器设置
+可变音调
+*/
+void beep_set()
+{
+	TIM_TimeBaseInitTypeDef TIM_Base_SET;
+	GPIO_InitTypeDef GPIO_config;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
+	
+	GPIO_config.GPIO_Mode	=	GPIO_Mode_AF_PP;//复用推挽
+	GPIO_config.GPIO_Speed	=	GPIO_Speed_50MHz;
+	/*beep GPIO set*/
+	GPIO_config.GPIO_Pin	=	beep_GPIO_Pin;
+	GPIO_Init(beep_GPIO,&GPIO_config);
+	
+	GPIO_SetBits(beep_GPIO,beep_GPIO_Pin);
+	
+	/*20-20000hz*/
+	TIM_Base_SET.TIM_Prescaler		=	72;//时钟频率
+	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
+	TIM_Base_SET.TIM_Period			=	1000;//控制音调
+	TIM_Base_SET.TIM_ClockDivision	=	TIM_CKD_DIV1;	
+	TIM_TimeBaseInit(TIM1,&TIM_Base_SET);
+	
+	TIM_OCSet.TIM_OCMode			=	TIM_OCMode_PWM1;
+	TIM_OCSet.TIM_OutputState		=	TIM_OutputState_Enable;
+	TIM_OCSet.TIM_Pulse				=	10001;//控制响度
+	TIM_OCSet.TIM_OCPolarity		=	TIM_OCPolarity_High;
 
+	TIM_OC1Init(TIM1,&TIM_OCSet);
+	TIM_CtrlPWMOutputs(TIM1,ENABLE);
+	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
+	TIM_ARRPreloadConfig(TIM1, ENABLE);
+	TIM_Cmd(TIM1, ENABLE);
+	
+}
 void PWM1_Enable()
 {
 	TIM_OCSet.TIM_Pulse	=	100;
@@ -121,36 +160,5 @@ int set_frequence(uint16_t frequence)
 	PWM_SET();
 	return SUCCESS;
 }
-
-/*
-蜂鸣器设置
-可变音调
-*/
-void beep_set()
-{
-	TIM_TimeBaseInitTypeDef TIM_Base_SET;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);
-	
-	
-	/*20-20000hz*/
-	TIM_Base_SET.TIM_Prescaler	=	7200;//时钟频率1M
-	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
-	TIM_Base_SET.TIM_Period	=	10;
-	TIM_Base_SET.TIM_ClockDivision	=TIM_CKD_DIV1;	
-//	TIM_Base_SET.TIM_RepetitionCounter	=	
-	TIM_TimeBaseInit(TIM1,&TIM_Base_SET);
-	
-	TIM_OCSet.TIM_OCMode	=	TIM_OCMode_PWM1;
-	TIM_OCSet.TIM_OutputState	=	TIM_OutputState_Enable;
-	TIM_OCSet.TIM_Pulse	=	1000;
-	TIM_OCSet.TIM_OCPolarity	=	TIM_OCPolarity_High;
-
-	TIM_OC1Init(TIM1,&TIM_OCSet);
-	
-	
-	
-	
-}
-
 #endif	/*PWM_C*/
 

@@ -4,6 +4,7 @@
 #include	"ADC.H"
 #include	"dispatcher.h"
 #include	"rev.h"
+#include	"temperature.h"
 
 #ifdef USE_HIGN_PASS
 float b=0.05;//高通滤波器滤波参数
@@ -19,6 +20,7 @@ extern uint16_t voltage_offset;
 extern uint16_t ADC_sourse[4];
 extern uint16_t ADC_Fliter[4];
 extern uint16_t HX_weight;
+extern uint16_t rmp;
 /*
 均值滤波用数组
 */
@@ -36,7 +38,7 @@ void Low_Pass_init(void)	//滤波器参数初始化
 	a_parameter[a_KEY]=		0.99;
 	a_parameter[a_poten]=	0.9999;
 	a_parameter[a_bat]=		0.1;
-	a_parameter[a_cur]=		0.5;
+	a_parameter[a_cur]=		0.1;
 	a_parameter[a_weight]=	1;
 	out_data.clock_overturn=100;
 
@@ -127,14 +129,14 @@ void parameter_cuc(void)
 {
 	data.current	=	(ADC_Fliter[CUR]+100-current_offset)*current_ratio;//
 	data.voltage	=	(ADC_Fliter[BAT]+100-voltage_offset)*voltage_ratio;//单位：v
-	data.power	=	(data.current*data.voltage);//单位：W
-	data.pull	=	Average_Result[A_weight];//单位：g
+	data.power		=	(data.current*data.voltage);//单位：W
+	data.pull		=	Average_Result[A_weight];//单位：g
 	data.efficiency	=	data.pull/data.power;//单位：g/w
 	data.throttle	=	ADC_Fliter[poten];		//范围是0-4000
-	if(data.throttle>4000)data.throttle=4000;
-	data.tempture0	=	Average_Result[A_CUR]; //均值滤波
-	data.tempture1	=	ADC_sourse[CUR];//数据源
-	data.rmp	=	ADC_Fliter[CUR];//get_rmp();
+	if(data.throttle>4000)data.throttle=4000;	//限幅
+	data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //这个公式是抄的，
+	data.tempture1	=	0;//Read_MLX_IIC_Data(0x06);;//数据源
+	data.rmp		=	rmp;
 }
 
 
@@ -142,6 +144,7 @@ void parameter_cuc(void)
 
 #endif	/*USE_AVERAGE_FLITER*/
 
+//高通滤波器
 #ifdef USE_HIGN_PASS
 void HighPass(void)
 {

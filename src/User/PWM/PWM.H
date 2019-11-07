@@ -12,6 +12,9 @@
 #define PWM0 0	//电机控制输出
 #define PWM1 1	//舵机控制输出
 
+#define	beep_GPIO	GPIOA
+#define	beep_GPIO_Pin	GPIO_Pin_8
+
 #define	beep_TIM	TIM1
 
 
@@ -26,7 +29,7 @@ void PWM2_Enable(void);
 void PWM2_Disable(void);
 void PWM2OutPut(uint16_t vaule);
 
-void beep_set();
+
 
 
 #endif	/*PWM_H*/

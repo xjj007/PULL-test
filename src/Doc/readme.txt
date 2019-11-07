@@ -63,7 +63,7 @@ ADC按键	PA0		ADC0-0
 拉力传感器DAT	PA11	软件IO，随意调换
 拉力传感器SCK	PA12	软件IO，随意调换
 
-红外转速传感器	PB0		TIM3-CH3	
+红外转速传感器	PA7		TIM3-CH2	
 
 OLED_SCL	PA5		软件IO，随意调换
 OLED_SDA	PA7		软件IO，随意调换

@@ -18,8 +18,6 @@ void delay_ms(uint32_t ms);
 void dispatcher(void);
 void dispatcherMain(void);
 void dispatcher_set(void);
-void TIM2_inti(uint16_t peroi);
-void TIM1_inti(void);
 
 void TaskInit(void);
 
