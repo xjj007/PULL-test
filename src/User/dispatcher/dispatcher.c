@@ -8,6 +8,7 @@
 #include	"USART_CONFIG.H"
 #include	"UI.H"
 #include	"rev.h"
+#include	"temperature.h"
 
 #define	USE_DSIPATCHER
 
@@ -69,8 +70,12 @@ struct					//此结构体下时间单位为ms
 	u32 USARTranmitPer;
 	void (*USARTranmit)(void);
 	
-	u32 FliterFPS;		//滤波器帧率计算
-	u32 FliterFPSCounter;	//
+	u32 TemperautreRemain;		//不需要函数指针，直接调用
+	u32 TemperaturePer;
+	
+	
+	u32 FliterFPS;				//滤波器帧率计算
+	u32 FliterFPSCounter;		//
 
 }Tick;
 
@@ -90,6 +95,9 @@ void TaskInit()
 	Tick.USARTransmitRemain	=	Tick.USARTranmitPer;
 	Tick.USARTranmit	=	&ANO_TransmitCallBack;
 	
+	Tick.TemperaturePer	=	FPS(10);
+	Tick.TemperautreRemain=Tick.TemperaturePer;
+	
 	Tick.FliterFPS	=	0;
 	Tick.FliterFPSCounter=0;
 
@@ -107,10 +115,10 @@ static  uint32_t SysTickConfig(uint32_t ticks)
   SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
   NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
-  SysTick->CTRL  =   SysTick_CTRL_TICKINT_Msk   |											//启动sysTick
-					 SysTick_CTRL_CLKSOURCE_Msk |				//	AHB时钟
-					 SysTick_CTRL_ENABLE_Msk;					
-  return 0;                                                  /* Function successful */
+  SysTick->CTRL  =		SysTick_CTRL_TICKINT_Msk   |							//启动sysTick
+										SysTick_CTRL_CLKSOURCE_Msk|							//	AHB时钟
+										SysTick_CTRL_ENABLE_Msk;					
+  return 0;       																						/* Function successful */
 }
 
 //向下计数
@@ -131,7 +139,7 @@ void dispatcher(void)
 	/*每100ms读下电机的转速*/
 	if(ANO.clock%100==0)
 	{
-	rmp	=	get_rmp()*10/2;
+	rmp	=	get_rmp()*10/2;//这个算法需要优化
 	}
 	if(ANO.clock==1000)
 	{	
@@ -142,6 +150,10 @@ void dispatcher(void)
 	}
 	if(Tick.delay>0 )
 		Tick.delay--;
+	
+	/*刷新温度*/
+	if(Tick.TemperautreRemain >0)Tick.TemperautreRemain--;
+	else Tick.TemperautreRemain=Tick.TemperaturePer;
 	
 	if(Tick.OledRefreshTaskRemainTime>0) Tick.OledRefreshTaskRemainTime--;
 	else
@@ -167,10 +179,17 @@ void dispatcherMain()
 	Tick.FliterFPSCounter++;
 	LOWPASS();
 	parameter_cuc();
+	
 	if((Read_DOUT==RESET)&&HX711_FLAG)//HX711准备好，且未开始读取
 	HX_weight=get_wetght();
 	
 	PWM1_Out_H(data.throttle);
+	
+	if(Tick.TemperautreRemain==Tick.TemperaturePer)
+	{
+		data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //远端温度
+		data.tempture1	=	Read_MLX_IIC_Data(0x06)*0.02-273.15;	//探头本身温度
+	}
 	
 	if(Tick.OledRefreshTaskRemainTime==Tick.OLedRefreshTaskPerTime)
 	(*Tick.OledRefreshTask)();

@@ -25,7 +25,7 @@ bool RightKeyPress=false;
 
 u8 key_effect	=	0;	//记录按键有效次数
 u8 OLD_KEY	=	no_key;	//上一次的按键键值
-
+extern  all_data data;
 
 /*
 这个需要写4个吗
@@ -81,7 +81,6 @@ bool rightKey()
 放大100倍，以uint16储存，显示自动加小数点
 */
 
-#if 1
 static void ADCx_GPIO_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -182,7 +181,7 @@ void current_calibrater()
 	current_offset=temp/10;
 }
 
-
+//这个需要重新采样
 //返回ADC对应的键值
 uint8_t key_vaule()
 {	
@@ -220,7 +219,39 @@ u8  getK()
 {
 return 0;
 }
-#endif
 
+
+/*
+开机后首先运行
+返回电池节数
+电池下限电压调整为3.5V，上限4.35V
+低于3.5V的电池就不应该继续测试了
+主要目的是防止电池过放
+电压参考范围：
+  2V	-	4.35V	//1S	2v以下应该就挂了
+5.5V	-	8.7V 	//2S
+8.7V 	-	13.5V	//3S
+13.6V	-	17.4V	//4S
+17.5V	-	21.7V	//5S
+21.8V	-	26.1V	//6S
+26.1V	-	30.45V	//7S
+30.6V	-	34.8V	//8S
+34.9V	-	39.15V	//9S
+39.2V	-	43.5V	//10S	//此电压硬件不支持
+*/
+u8 bettery_cells_check()
+{	
+	if(data.voltage<4.35)	return 1;
+	if(data.voltage<8.7 )	return 2;
+	if(data.voltage<13.5)	return 3;
+	if(data.voltage<17.4)	return 4;
+	if(data.voltage<21.7)	return 5;
+	if(data.voltage<26.1)	return 6;
+	if(data.voltage<30.45)	return 7;
+	if(data.voltage<34.8)	return 8;
+	if(data.voltage<39.15)	return 9;
+	if(data.voltage<43.5)	return 10;
+	return 0;	//错误！
+}
 
 #endif	/*ADC_C*/

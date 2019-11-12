@@ -23,6 +23,7 @@ extern uint16_t HX_weight;
 extern uint16_t rmp;
 /*
 均值滤波用数组
+电流传感器在大电流的情况下会有较大的噪声
 */
 #define AverageBuff		16	//均值滤波的数量
 uint16_t ADC_Average[e_average_num][AverageBuff];
@@ -134,8 +135,8 @@ void parameter_cuc(void)
 	data.efficiency	=	data.pull/data.power;//单位：g/w
 	data.throttle	=	ADC_Fliter[poten];		//范围是0-4000
 	if(data.throttle>4000)data.throttle=4000;	//限幅
-	data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //这个公式是抄的，
-	data.tempture1	=	0;//Read_MLX_IIC_Data(0x06);;//数据源
+	//data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //这个公式是抄的，
+	//data.tempture1	=	0;//Read_MLX_IIC_Data(0x06);;//数据源
 	data.rmp		=	rmp;
 }
 
@@ -158,4 +159,3 @@ void HighPass(void)
 
 #endif
 #endif 	/*FLITER_C*/
-

@@ -44,6 +44,6 @@
 #define MLX90614_ID4 0x3F
 
 uint16_t Read_MLX_IIC_Data(u8 res);
-void MLX90614_Init();
+void MLX90614_Init(void);
 
 #endif	/*TEMPERATURE_H*/

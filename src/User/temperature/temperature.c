@@ -2,7 +2,10 @@
 #define	TEMPERATURE_C
 
 #include	"temperature.h"
- 
+
+/*
+非接触式温度传感器 10HZ读取速度
+*/
 
 void MLX90614_Init()
 {

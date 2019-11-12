@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32F103C8</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F1xx_DFP.1.1.0</PackID>
+          <PackID>Keil.STM32F1xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x5000) IROM(0x08000000,0x10000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -338,7 +338,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\User\EPD;..\Libraries\CMSIS;..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\User;..\User\Fonts;..\User\fliter;..\User\PWM;..\User\rev;..\User\temperature;..\User\HX711;..\User\dispatcher;..\User\UI;..\User\fliter;..\User\OLED;..\User\ADC;..\User\usart;..\User\flash</IncludePath>
+              <IncludePath>..\User\EPD;..\Libraries\CMSIS;..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\User;..\User\Fonts;..\User\fliter;..\User\PWM;..\User\rev;..\User\temperature;..\User\HX711;..\User\dispatcher;..\User\UI;..\User\fliter;..\User\OLED;..\User\ADC;..\User\usart;..\User\flash;..\User\beep</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -556,6 +556,16 @@
               <FileName>stm32f10x_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\stm32f10x_it.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BEEP</GroupName>
+          <Files>
+            <File>
+              <FileName>beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\beep\beep.c</FilePath>
             </File>
           </Files>
         </Group>

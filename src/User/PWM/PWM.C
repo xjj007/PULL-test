@@ -6,8 +6,6 @@
 
 uint16_t peroid;
 uint16_t fre=50;
-uint16_t beep_fre	=	5000;//单位HZ，取值20-20000
-uint16_t beep_Sound	=	0; //声音大小，0-10档		
 
 //uint16_t frequence	=	1/((float)peroid/100000);
  //uint16_t fre=1000000/peroid;
@@ -24,13 +22,9 @@ void PWM_GPIO_INIT(void)
 	
 	GPIO_config.GPIO_Pin	=	GPIO_MOTOR_Pin;
 	GPIO_Init(MOTO_GPIO,&GPIO_config);
-	
-	//GPIO_config.GPIO_Pin	=	GPIO_POTEN_Pin;
-	//GPIO_Init(POTEN_GPIO,&GPIO_config);
-	
+		
 	
 	GPIO_ResetBits(MOTO_GPIO,GPIO_MOTOR_Pin);
-	//GPIO_ResetBits(POTEN_GPIO,GPIO_POTEN_Pin);
 
 }
 
@@ -61,46 +55,7 @@ void PWM_GPIO_INIT(void)
 	
 	TIM_Cmd(TIM4, ENABLE);
 }
-/*
-蜂鸣器设置
-可变音调
-*/
-void beep_set()
-{
-	TIM_TimeBaseInitTypeDef TIM_Base_SET;
-	GPIO_InitTypeDef GPIO_config;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
-	
-	GPIO_config.GPIO_Mode	=	GPIO_Mode_AF_PP;//复用推挽
-	GPIO_config.GPIO_Speed	=	GPIO_Speed_50MHz;
-	/*beep GPIO set*/
-	GPIO_config.GPIO_Pin	=	beep_GPIO_Pin;
-	GPIO_Init(beep_GPIO,&GPIO_config);
-	
-	GPIO_SetBits(beep_GPIO,beep_GPIO_Pin);
-	
-	/*20-20000hz*/
-	TIM_Base_SET.TIM_Prescaler		=	Beep_TIM_Prescaler;//时钟频率
-	
-	TIM_Base_SET.TIM_CounterMode	=	TIM_CounterMode_Up;
-	TIM_Base_SET.TIM_Period			=	beep_TIM_Period;//控制音调
-	TIM_Base_SET.TIM_ClockDivision	=	TIM_CKD_DIV1;	
-	TIM_TimeBaseInit(TIM1,&TIM_Base_SET);
-	
-	TIM_OCSet.TIM_OCMode			=	TIM_OCMode_PWM1;
-	TIM_OCSet.TIM_OutputState		=	TIM_OutputState_Enable;
-	TIM_OCSet.TIM_Pulse				=	beep_TIM_Pulse;//控制响度
-	TIM_OCSet.TIM_OCPolarity		=	TIM_OCPolarity_High;
 
-	TIM_OC1Init(TIM1,&TIM_OCSet);
-	TIM_CtrlPWMOutputs(TIM1,ENABLE);
-	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
-	TIM_ARRPreloadConfig(TIM1, ENABLE);
-	TIM_Cmd(TIM1, ENABLE);
-	
-}
 void PWM1_Enable()
 {
 	TIM_OCSet.TIM_Pulse	=	100;

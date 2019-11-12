@@ -39,21 +39,21 @@ typedef struct	{
 	float 			power;		 //功率
 	float			efficiency;//桨效
 	float			pull;			 //拉力
-	uint16_t		throttle;	 //油门位置
+	uint16_t			throttle;	 //油门位置
 	uint16_t  		rmp;			 //转速
 	float			tempture0; //温度0
 	float 			tempture1; //温度1
-	uint16_t		clock;		 //时钟
+	uint16_t			clock;		 //时钟
 	
 }all_data;
  
 typedef struct	output_data{	//输出显示预览
-	uint16_t	current;	 	//电流		99.99A
-	uint16_t	voltage;	 	//电压		16.51V
+	uint16_t		current;	 	//电流		99.99A
+	uint16_t		voltage;	 	//电压		16.51V
 	uint16_t 	power;		 	//功率		1500W
-	uint16_t	efficiency;		//桨效		10.123G/W
-	uint16_t	pull;			 //拉力		4999g
-	uint16_t	throttle;	 	//油门 	4096;(99%)//两种显示模式
+	uint16_t		efficiency;		//桨效		10.123G/W
+	uint16_t		pull;			 //拉力		4999g
+	uint16_t		throttle;	 	//油门 	4096;(99%)//两种显示模式
 	uint16_t  	rmp;			//转速		3500r/S
 	uint16_t	tempture0; //温度0
 	uint16_t 	tempture1; //温度1

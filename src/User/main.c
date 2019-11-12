@@ -17,11 +17,37 @@
 #include  "flash.h"
 #include  "rev.h"
 #include  "temperature.h"
+#include	  "beep.h"
+
+/*
+电池保护策略：
+只低压报警，不干扰输出
+*/
+
+/*
+过热保护策略：
+两个阈值：
+第一个阈值降低到当前输出的50%
+
+第二个阈值立即关闭动力
+
+*/
+
+/*
+过流保护策略：
+
+电流因为其均值滤波比较大，所以响应会慢，只能作为一个击穿后的
+防止继续短路导致燃烧
+事实上如果真的已经发生了电调烧毁或者电机烧毁
+过流保护是没有用的，单片机无法关断主供电
+因此不设计电流保护
+*/
 
 //所有的功能开关在dispatcher.h里
 //内存不太够啊
 //要不然加个flash
-
+//OLED 要打印出完整的数据，并且最好能做个示波器出来
+//示波器模式：选择信号源，选择DIV，
 uint8_t paint[1024]={0};	//7行128列
 extern uint16_t ADC_sourse[4];
 extern uint16_t ADC_Fliter[4];
@@ -45,33 +71,35 @@ int main()
 	
 #endif	/*USE_FLASH*/
 	
-	
+	dispatcher_set();//72M主频下 1000hz
 	
 	ADCx_Init();
 	HX711_SET();
 	PWM_SET();
 	beep_set();		
 	Low_Pass_init();
-	HX711set_to_0();
+	HX711set_to_0();//HX711清零
 	OLED_Init();
 	UIinit();
 	REV_Config();
-	USART_config();//配置串口
-	dispatcher_set();//72M主频下 1000hz
+	USART_config();
 	TaskInit();
-	
 	MLX90614_Init();
 	
-	
-
+	/*现在OLED不显示*/
 	
 	while(1)
 	{
 		dispatcherMain();
 	}
-		return 0;
-	
-	
+		return 0;	
 }
 
+
+void  sys_inti()
+{	
+	
+	u8 bat_cells	=	 bettery_cells_check();
+	
+}
 

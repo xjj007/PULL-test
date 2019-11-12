@@ -369,6 +369,7 @@ void draw_SolidRectangle(u8 x,u8 y,u8 Xend,u8 Yend,u8 Color)
 	uint8_t temp=0;
 	uint8_t row;
 	if(Xend<=x)
+		
 		return;
 	if(Yend<=y)
 		return;

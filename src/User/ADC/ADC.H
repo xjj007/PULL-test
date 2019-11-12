@@ -85,5 +85,5 @@ uint8_t key_vaule(void);
 uint8_t getkey(void);
 uint8_t getK(void);
 void ScanKey(void);
-
+u8 bettery_cells_check();
 #endif	/*ADC_H*/
