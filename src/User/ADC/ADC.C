@@ -17,64 +17,14 @@ uint16_t current_offset=115;//电流计偏移量
 float	   current_ratio=0.015072;//这个计算可能会损失精度
 
 
-bool upKeyPress=false;
-bool downKeyPress=false;
-bool leftKeyPress=false;
-bool RightKeyPress=false;
+
 
 
 u8 key_effect	=	0;	//记录按键有效次数
 u8 OLD_KEY	=	no_key;	//上一次的按键键值
 extern  all_data data;
 
-/*
-这个需要写4个吗
-*/
-bool upKey()
-{
-	if(upKeyPress	==	true)
-	{
-	
-		upKeyPress	=	false;
-		return true;
-	}
-	return false;
 
-}
-
-bool downKey()
-{
-	if(upKeyPress	==	true)
-	{
-	
-		upKeyPress	=	false;
-		return true;
-	}
-	return false;
-
-}
-bool leftKey()
-{
-	if(upKeyPress	==	true)
-	{
-	
-		upKeyPress	=	false;
-		return true;
-	}
-	return false;
-
-}
-bool rightKey()
-{
-	if(upKeyPress	==	true)
-	{
-	
-		upKeyPress	=	false;
-		return true;
-	}
-	return false;
-
-}
 /*
 采样电阻 0.5mR,增益100，
 精确比率：0.01611328125
@@ -181,33 +131,30 @@ void current_calibrater()
 	current_offset=temp/10;
 }
 
-//这个需要重新采样
-//返回ADC对应的键值
-uint8_t key_vaule()
+/*
+no_key:1069
+            478
+key0  :1547
+            621
+key1  :2168
+            681
+key2  :2849
+            875
+key3  :3724
+*/
+u8 key_vaule( u16 data)
 {	
 	
-	if(ADC_Fliter[KEY]>580&&ADC_Fliter[KEY]<600)
-		return no_key;
-	if(ADC_Fliter[KEY]>650&&ADC_Fliter[KEY]<700)
-		return down;
-	if(ADC_Fliter[KEY]>795&&ADC_Fliter[KEY]<835)
-		return up;
-	if(ADC_Fliter[KEY]>1000&&ADC_Fliter[KEY]<1040)
-		return right;
-	if(ADC_Fliter[KEY]>1335&&ADC_Fliter[KEY]<1400)
-		return mid;
-	if(ADC_Fliter[KEY]>2000&&ADC_Fliter[KEY]<2050)
-		return left;
-	return ERROR;
-	
+	if(data<1269)return no_key;
+    if(data<1847)return up;
+    if(data<2500)return down;
+    if(data<3300)return left;
+    return right;
 }
 
-//获取键值，按键扫描速度100hz
+//获取键值
 
-void ScanKey()
-{
 
-}
 
 
 u8 getkey()

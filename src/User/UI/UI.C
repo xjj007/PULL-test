@@ -10,39 +10,26 @@
 #include	"flash.h"
 #include	"dispatcher.h"
 
-extern uint8_t key_vaule_buff;
+extern uint8_t  key_vaule_buff;
 extern uint16_t ADC_Fliter[4];
 extern uint16_t ADC_sourse[4];
-extern uint8_t key_flag;
+extern uint8_t  key_flag;
 extern uint16_t current_offset;//电流计偏移量
-extern float	  current_ratio;
+extern float    current_ratio;
 extern float    voltage_ratio;
 extern uint16_t voltage_offset;
 extern all_data data;
 extern uint16_t fre;//PWM频率
 extern uint32_t baud_rate[12];
-extern uint8_t baud;
-extern float a_parameter[a_end];//低通滤波器参数
+extern uint8_t  baud;
+extern float    a_parameter[a_end];//低通滤波器参数
+/*
+OLED.C
+OLED刷新标志
+*/
+extern bool oledFresh;	
+
 uint16_t step=10,step_t=500;//每步长度
-
-/*
-全新的UI设计思路
-开机后直接显示手动控制的参数页（需要显示页面标题）
-按下菜单键才能显示其他功能
-自动测试前只用显示电调校准确认、步进 步时确认、倒计时开始
-
-这样逻辑就清晰多了
-
-ADC按键识别，无所谓多少
-
-*/
-
-/*
-
-数据在flash中是有顺序的，顺序
-不同层之间是否可以直接访问
-
-*/
 
 /*
 最简单的办法，给每个页面加上标号，按键操作通过枚举实现
@@ -269,8 +256,6 @@ void UIinit()
 
 }
 
-
-
 /*
 OLED刷新任务
 所有的页面最好能有一样的结构
@@ -279,18 +264,25 @@ OLED刷新任务
 */
 void OLED_Refresh()
 {	
-	//if(SYSUI.Page)//SYSUI.page 值变化的时候才能进行清屏操作，其他时候只能刷新页面动态数据
-
+  
 	switch(SYSUI.Page )
 	{
 		case 0:
 		power_on();//上电开机页
+        if(sys_time>1500)
+        {
+            SYSUI.Page=1;  //1.5s后开机跳转
+            OLED_Clear();   //跳转前清屏
+        }
 		break;
 		
 		case 1:		//菜单选择
-		page1();
-		show_function();
+		page2();
+        SYSUI.Page=2;
 		break;
+        case 2:
+            fresh_data();
+         break;
 			
 	}
 
@@ -298,20 +290,18 @@ void OLED_Refresh()
 }
 
 /*
-显示开机欢迎页
-静态页面
++------------+
+| 拉力测试台 |
+|POWER BY XJJ|
++------------+
 */
 void power_on()
 {	
-	
-	//OLED_Display_Off();
-	//OLED_Display_On();
 	uint8_t temp[6]={32,33,34,35,36,'\0'};//拉力测试台
 	show_string(4,10,temp,&FontCN24,COLOR);//24号中文字
 	show_string(20,45,"POWER BY XJJ",&Font8X16,COLOR);
 }
 
-/*非常的乱，需要使用更加易懂的语言描述*/
 void show_function()
 {	
 	uint8_t cursor=0;
@@ -474,7 +464,7 @@ void Sys_set()
 				break;
 			case mid:
 				set_Parameters(cursor);
-				while(key_vaule()!=no_key)delay_ms(10);//等待按键释放
+				//while(key_vaule()!=no_key)delay_ms(10);//等待按键释放
 			break;
 			case left:
 				write_flash();
@@ -936,9 +926,17 @@ void page1()
 	show_uint32(90,16,step_t,4,&Font8X16,COLOR);
 	show_string(80,32,"NEXT->",&Font8X16,COLOR);
 }
+/*
++----------------+
+|U:12.34vT:1234  |
+|I:12.34AP:12.34w|
+|F:1234 gE:12.34/|
+|R:1234 sQ:1234  |
++----------------+
+*/
 void page2()
 {
-	OLED_Clear();
+	//OLED_Clear();
 	show_string(0,0, "U:     v",&Font8X16,COLOR);
 	show_string(0,16,"I:     A",&Font8X16,COLOR);
 	show_string(0,32,"F:     g",&Font8X16,COLOR);
@@ -1186,19 +1184,17 @@ void show_data(uint8_t mode)
 
 }
 /*
-数据可以用结构体表示，
 数据坐标，字号，颜色，
-闪烁服务
 */
 void fresh_data()
 {
-		show_float(16,0,data.voltage,2,2,&Font8X16,COLOR);
-		show_float(16,16,data.current,2,2,&Font8X16,COLOR);
-		show_uint32(16,32,data.pull,4,&Font8X16,COLOR);
-		show_uint32(16,48,data.rmp,4,&Font8X16,COLOR);
-		show_uint32(80,0,data.throttle,4,&Font8X16,COLOR);
-		show_float(80,16,data.power,2,2,&Font8X16,COLOR);
-		show_float(80,32,data.efficiency,2,2,&Font8X16,COLOR);
+		show_float  (16, 0,data.voltage,    2,2,&Font8X16,COLOR);
+		show_float  (16,16,data.current,    2,2,&Font8X16,COLOR);
+		show_uint32 (16,32,data.pull,       4,  &Font8X16,COLOR);
+		show_uint32 (16,48,data.rmp,        4,  &Font8X16,COLOR);
+		show_uint32 (80, 0,data.throttle,   4,  &Font8X16,COLOR);
+		show_float  (80,16,data.power,      2,2,&Font8X16,COLOR);
+		show_float  (80,32,data.efficiency, 2,2,&Font8X16,COLOR);
 }
 
 //3s倒计时
@@ -1253,7 +1249,7 @@ void fliter_set()
 		break;
 			case mid:
 			set_lowpass_para((!course)+a_bat);
-			while(key_vaule()!=no_key)delay_ms(10);//等待按键释放
+			//while(key_vaule()!=no_key)delay_ms(10);//等待按键释放
 			break; 
 			
 			case left:

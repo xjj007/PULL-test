@@ -34,6 +34,11 @@ u8 Average_Point=0;
 output_data	out_data;
 all_data data;
 
+bool upKeyPress=false;
+bool downKeyPress=false;
+bool leftKeyPress=false;
+bool RightKeyPress=false;
+
 void Low_Pass_init(void)	//滤波器参数初始化
 {
 	a_parameter[a_KEY]=		0.99;
@@ -84,6 +89,76 @@ void Average()
 	
 }
 
+void ScanKey()
+{
+    if(Average_Result[A_KEY]<1269) return ;
+    
+    if(Average_Result[A_KEY]<1847)
+    {
+        upKeyPress=true;
+        return ;
+    }
+    if(Average_Result[A_KEY]<2500)
+    {
+        downKeyPress=true;
+        return ;
+    }
+    if(Average_Result[A_KEY]<3300)
+    {
+        leftKeyPress=true;
+        return ;
+    }
+    RightKeyPress=true;
+    return ;
+}
+/*
+这个需要写4个吗
+*/
+bool upKey()
+{
+	if(upKeyPress	==	true)
+	{
+	
+		upKeyPress	=	false;
+		return true;
+	}
+	return false;
+
+}
+
+bool downKey()
+{
+	if(downKeyPress	==	true)
+	{
+	
+		downKeyPress	=	false;
+		return true;
+	}
+	return false;
+
+}
+bool leftKey()
+{
+	if(leftKeyPress	==	true)
+	{
+	
+		leftKeyPress	=	false;
+		return true;
+	}
+	return false;
+
+}
+bool rightKey()
+{
+	if(RightKeyPress	==	true)
+	{
+	
+		RightKeyPress	=	false;
+		return true;
+	}
+	return false;
+
+}
 //==================================//
 //低通滤波器
 //Y(n)=a*X(n)+(1-a)*Y(n-1)
@@ -137,7 +212,7 @@ void parameter_cuc(void)
 	if(data.throttle>4000)data.throttle=4000;	//限幅
 	//data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //这个公式是抄的，
 	//data.tempture1	=	0;//Read_MLX_IIC_Data(0x06);;//数据源
-	data.rmp		=	rmp;
+	data.rmp		=	Average_Result[KEY];//rmp;
 }
 
 

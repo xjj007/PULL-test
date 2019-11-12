@@ -1,8 +1,10 @@
 #ifndef __OLED_H
 #define __OLED_H			  	 
-#include	"stm32f10x.h"
+#include "stm32f10x.h"
 #include "stdlib.h"	  
 #include "fonts.h"
+
+#define	OLED_diration 0	//oled方向 （0-3）4个方向
 
 #define white 0xff
 #define black 0
@@ -22,11 +24,11 @@
 #define Y_WIDTH 		64	    						  
 //-----------------OLED IIC端口定义----------------  					   
 
-#define OLED_SCLK_Clr() GPIO_ResetBits(GPIOA,GPIO_Pin_5)//SCL
-#define OLED_SCLK_Set() GPIO_SetBits(GPIOA,GPIO_Pin_5)
+#define OLED_SCLK_Clr() GPIO_ResetBits(GPIOA,GPIO_Pin_6)//SCL
+#define OLED_SCLK_Set() GPIO_SetBits(GPIOA,GPIO_Pin_6)
 
-#define OLED_SDIN_Clr() GPIO_ResetBits(GPIOA,GPIO_Pin_7)//SDA
-#define OLED_SDIN_Set() GPIO_SetBits(GPIOA,GPIO_Pin_7)
+#define OLED_SDIN_Clr() GPIO_ResetBits(GPIOA,GPIO_Pin_5)//SDA
+#define OLED_SDIN_Set() GPIO_SetBits(GPIOA,GPIO_Pin_5)
 
  		     
 #define OLED_CMD  0	//写命令

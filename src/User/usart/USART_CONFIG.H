@@ -49,6 +49,7 @@ typedef struct
 
 
 extern  ANO_DT	ANO;
+extern  bool Bluetooth_connect;
 
 void USART_GPIO_INTIT(void);
 void USART_config(void);
@@ -66,6 +67,6 @@ void clear_USART1_RX_buff(void);
 uint8_t Bluetooth(void);
 void set_USART1_Baud(uint32_t baud);
 void NVIC_config(void);
-
+void Bluetooth_state_LED_init(void);
 #endif	/*USART_CONFIG_H*/
 

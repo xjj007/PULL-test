@@ -7,12 +7,12 @@
   * @brief   这个文件用来配置串口通信
   ******************************************************************************
   */
-#include "stm32f10x.h"
-#include	"USART_CONFIG.H"
-#include	"dispatcher.h"
-#include "fonts.h"
+#include    "stm32f10x.h"
+#include    "USART_CONFIG.H"
+#include    "dispatcher.h"
+#include    "fonts.h"
 #include	"OLED.H"
-#include	"fliter.h"
+#include    "fliter.h"
 extern uint16_t USART_RX_FLAG;
 extern all_data data;
 #ifdef	USE_USART1
@@ -31,7 +31,9 @@ uint32_t baud_rate[12]={460800,921600,230400,38400,115200,
 												
 uint8_t data_to_send[50];	//匿名科创发送数据缓存
 
-
+/*蓝牙连接状态指示*/
+bool Bluetooth_connect  =   false;
+                        
 ANO_DT	ANO={0};						
 						
 void	USART_GPIO_INTIT()
@@ -76,7 +78,7 @@ void USART_config(void)
 		uint32_t over_time;
 		NVIC_config();
 		USART_GPIO_INTIT();
-	
+        Bluetooth_state_LED_init();
 	
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);//打开时钟
 	//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
@@ -378,3 +380,29 @@ void clear_USART1_RX_buff()
 	USART_RX_FLAG=0;
 }
 
+/*
+lED 状态判断：
+
+未连接：每100ms左右LED发生一次状态翻转
+逻辑分析仪测试结果为100-110ms
+连接状态下常亮（高电平）
+连续检测150ms,状态翻转就为未连接
+得用计划任务
+将2次采样的值相对比
+一样就connected
+不一样就Unconnect
+配置蓝牙之前需要判断连接状态
+*/
+void Bluetooth_state_LED_init()
+{
+    	GPIO_InitTypeDef	GPIO_INIT;
+
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);
+		GPIO_INIT.GPIO_Speed=GPIO_Speed_50MHz;
+	
+	
+		GPIO_INIT.GPIO_Mode	=	GPIO_Mode_IN_FLOATING;	//浮空输入
+		GPIO_INIT.GPIO_Pin	=	GPIO_Pin_15;						//USART1_RX
+		GPIO_Init(GPIOC,&GPIO_INIT);
+
+}

@@ -25,12 +25,13 @@ enum ADC_Sourse		//ADC Ô´
 
 enum _key_vaule		//¼üÖµ
 {	
-		no_key,
-		down,
+		no_key=0,
 		up,
-		right,
-		mid,
+		down,
+        mid,
 		left,
+		right,
+		Err,
 };
 
 
@@ -78,12 +79,10 @@ enum _key_vaule		//¼üÖµ
 void ADCx_Init(void);
 void KEY_INIT(void);
 static void ADC_NVIC_Config(void);
-uint8_t key_vaule(void);
+u8 key_vaule( u16 data);
 void voltage_calibration(int offset);
 void current_calibrater(void);
-uint8_t key_vaule(void);
 uint8_t getkey(void);
 uint8_t getK(void);
-void ScanKey(void);
 u8 bettery_cells_check();
 #endif	/*ADC_H*/

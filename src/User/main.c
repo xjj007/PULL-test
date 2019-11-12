@@ -17,8 +17,11 @@
 #include  "flash.h"
 #include  "rev.h"
 #include  "temperature.h"
-#include	  "beep.h"
+#include  "beep.h"
 
+/*
+
+*/
 /*
 电池保护策略：
 只低压报警，不干扰输出
@@ -35,6 +38,7 @@
 
 /*
 过流保护策略：
+
 
 电流因为其均值滤波比较大，所以响应会慢，只能作为一个击穿后的
 防止继续短路导致燃烧
@@ -53,7 +57,7 @@ extern uint16_t ADC_sourse[4];
 extern uint16_t ADC_Fliter[4];
 extern uint8_t key_vaule_buff;
 extern uint16_t current_offset;//电流计偏移量
-
+extern all_data data;
 int main()
 {	
 	
@@ -91,12 +95,13 @@ int main()
 	while(1)
 	{
 		dispatcherMain();
+        
 	}
 		return 0;	
 }
 
 
-void  sys_inti()
+void  sys_init()
 {	
 	
 	u8 bat_cells	=	 bettery_cells_check();

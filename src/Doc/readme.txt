@@ -81,3 +81,7 @@ RX	PA10
 电源低电压保护	//低电压立即停机报警
 过温度保护	超过一定温度立即停机报警
 限流保护：电流超过一定值后，关闭功率输出，调节功率输出使电流不超过电流保护最大值（这个想法可能有点困难）
+
+Program Size: Code=23196 RO-data=3924 RW-data=240 ZI-data=2480  
+Program Size: Code=23196 RO-data=3924 RW-data=240 ZI-data=2480  
+Program Size: Code=23196 RO-data=3924 RW-data=240 ZI-data=2480  

@@ -9,7 +9,7 @@
 //#define PWM_TEST
 
 
-
+extern volatile uint64_t sys_time;
 
 #ifndef	USE_TIM6_DELAY
 void delay_ms(uint32_t ms);

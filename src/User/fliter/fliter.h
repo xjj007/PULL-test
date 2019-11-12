@@ -37,28 +37,28 @@ typedef struct	{
 	float			current;	 //电流
 	float			voltage;	 //电压
 	float 			power;		 //功率
-	float			efficiency;//桨效
-	float			pull;			 //拉力
-	uint16_t			throttle;	 //油门位置
-	uint16_t  		rmp;			 //转速
-	float			tempture0; //温度0
-	float 			tempture1; //温度1
-	uint16_t			clock;		 //时钟
+	float			efficiency;  //桨效
+	float			pull;        //拉力
+	uint16_t        throttle;	 //油门位置
+	uint16_t  		rmp;		 //转速
+	float			tempture0;   //温度0
+	float 			tempture1;   //温度1
+	uint16_t        clock;		 //时钟
 	
 }all_data;
  
-typedef struct	output_data{	//输出显示预览
+typedef struct	output_data{	    //输出显示预览
 	uint16_t		current;	 	//电流		99.99A
 	uint16_t		voltage;	 	//电压		16.51V
-	uint16_t 	power;		 	//功率		1500W
+	uint16_t        power;		 	//功率		1500W
 	uint16_t		efficiency;		//桨效		10.123G/W
-	uint16_t		pull;			 //拉力		4999g
+	uint16_t		pull;			//拉力		4999g
 	uint16_t		throttle;	 	//油门 	4096;(99%)//两种显示模式
-	uint16_t  	rmp;			//转速		3500r/S
-	uint16_t	tempture0; //温度0
-	uint16_t 	tempture1; //温度1
-	int			clock_overturn;//翻转的时钟
-	uint32_t	clock;		 //时钟	
+	uint16_t        rmp;			//转速		3500r/S
+	uint16_t        tempture0;      //温度0
+	uint16_t        tempture1;      //温度1
+	int             clock_overturn; //翻转的时钟
+	uint32_t        clock;		    //时钟	
 	//有两种显示模式，固定时间翻转至定值或者记录当前精确时间
 	
 }output_data;
@@ -74,5 +74,9 @@ uint16_t poten_Pass(void);
 void HighPass(void);
 void PWM1_Out_H(uint16_t vaule);
 void parameter_cuc(void);
-
+void ScanKey(void);
+bool upKey(void);
+bool downKey(void);
+bool leftKey(void);
+bool rightKey(void);
 #endif	/*FLITER_H*/

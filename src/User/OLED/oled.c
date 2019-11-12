@@ -9,6 +9,8 @@
    
 extern uint8_t paint[1024];
 
+bool oledFresh	=	false;//OLED刷新标志，当OLED需要刷新的时候置位
+
 uint64_t word_catch=0;//临时储存合成字符的容器
 
 void IIC_Start()
@@ -25,10 +27,9 @@ void IIC_Start()
 void IIC_Stop()
 {
 	OLED_SCLK_Set() ;
-//OLED_SCLK_Clr();
+	//OLED_SCLK_Clr();
 	OLED_SDIN_Clr();
 	OLED_SDIN_Set();
-	
 }
 
 void IIC_Wait_Ack()
@@ -49,31 +50,28 @@ void Write_IIC_Byte(unsigned char IIC_Byte)
 	for(i=0;i<8;i++)		
 	{
 			m=da;
-		//	OLED_SCLK_Clr();
+		//OLED_SCLK_Clr();
 		m=m&0x80;
-		if(m==0x80)
-		{OLED_SDIN_Set();}
-		else OLED_SDIN_Clr();
-			da=da<<1;
+		if(m==0x80)OLED_SDIN_Set();
+		else 	   OLED_SDIN_Clr();
+		da=da<<1;
 		OLED_SCLK_Set();
 		OLED_SCLK_Clr();
-		}
-
-
+	}
 }
 /**********************************************
 // IIC Write Command
 **********************************************/
 void Write_IIC_Command(unsigned char IIC_Command)
 {
-   IIC_Start();
-   Write_IIC_Byte(0x78);            //Slave address,SA0=0
+	IIC_Start();
+	Write_IIC_Byte(0x78);            //Slave address,SA0=0
 	IIC_Wait_Ack();	
-   Write_IIC_Byte(0x00);			//write command
+	Write_IIC_Byte(0x00);			//write command
 	IIC_Wait_Ack();	
-   Write_IIC_Byte(IIC_Command); 
+	Write_IIC_Byte(IIC_Command); 
 	IIC_Wait_Ack();	
-   IIC_Stop();
+	IIC_Stop();
 }
 /**********************************************
 // IIC Write Data
@@ -91,18 +89,9 @@ void Write_IIC_Data(unsigned char IIC_Data)
 }
 void OLED_WR_Byte(unsigned dat,unsigned cmd)
 {
-	if(cmd)
-			{
-
-   Write_IIC_Data(dat);
-   
-		}
-	else {
-   Write_IIC_Command(dat);
-		
-	}
-
-
+	if(cmd)		Write_IIC_Data(dat);
+   	
+	else		Write_IIC_Command(dat);
 }
 
 
@@ -168,11 +157,11 @@ void OLED_Init(void)
  	
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	 //使能A端口时钟
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5|GPIO_Pin_7;	 
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5|GPIO_Pin_6;	 
  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//速度50MHz
- 	GPIO_Init(GPIOA, &GPIO_InitStructure);	  //初始化GPIOD3,6
- 	GPIO_SetBits(GPIOA,GPIO_Pin_5|GPIO_Pin_7);	
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		//速度50MHz
+ 	GPIO_Init(GPIOA, &GPIO_InitStructure);	  				//初始化GPIOD3,6
+ 	GPIO_SetBits(GPIOA,GPIO_Pin_5|GPIO_Pin_6);	
 
 
 	OLED_WR_Byte(0xAE,OLED_CMD);//--display off
@@ -182,11 +171,29 @@ void OLED_Init(void)
 	OLED_WR_Byte(0xB0,OLED_CMD);//--set page address
 	OLED_WR_Byte(0x81,OLED_CMD); // contract control
 	OLED_WR_Byte(0xFF,OLED_CMD);//--128   
-	OLED_WR_Byte(0xA1,OLED_CMD);//set segment remap 
+
+#if OLED_diration   == 0
+	
+	OLED_WR_Byte(0xA0,OLED_CMD);//set segment remap 	
+	OLED_WR_Byte(0xC0,OLED_CMD);//Com scan direction	
+#endif
+#if OLED_diration   ==  1
+    OLED_WR_Byte(0xA1,OLED_CMD);//set segment remap 	
+	OLED_WR_Byte(0xC0,OLED_CMD);//Com scan direction	
+#endif
+#if OLED_diration   ==   2
+    OLED_WR_Byte(0xA0,OLED_CMD);//set segment remap 	
+	OLED_WR_Byte(0xC8,OLED_CMD);//Com scan direction	
+#endif 
+#if OLED_diration   ==   3
+    OLED_WR_Byte(0xA1,OLED_CMD);//set segment remap 	
+	OLED_WR_Byte(0xC8,OLED_CMD);//Com scan direction	
+#endif
+	
 	OLED_WR_Byte(0xA6,OLED_CMD);//--normal / reverse
 	OLED_WR_Byte(0xA8,OLED_CMD);//--set multiplex ratio(1 to 64)
 	OLED_WR_Byte(0x3F,OLED_CMD);//--1/32 duty
-	OLED_WR_Byte(0xC8,OLED_CMD);//Com scan direction
+	
 	OLED_WR_Byte(0xD3,OLED_CMD);//-set display offset
 	OLED_WR_Byte(0x00,OLED_CMD);//
 	
@@ -208,8 +215,11 @@ void OLED_Init(void)
 	OLED_WR_Byte(0x8D,OLED_CMD);//set charge pump enable
 	OLED_WR_Byte(0x14,OLED_CMD);//
 	
-	OLED_WR_Byte(0xAF,OLED_CMD);//--turn on oled panel
+	//OLED_WR_Byte(0x20,OLED_CMD);//set charge pump enable
+	//OLED_WR_Byte(0x01,OLED_CMD);//
 	
+	OLED_WR_Byte(0xAF,OLED_CMD);//--turn on oled panel
+	oledFresh=true;
 
 }  
 

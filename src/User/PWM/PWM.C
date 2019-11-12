@@ -7,8 +7,6 @@
 uint16_t peroid;
 uint16_t fre=50;
 
-//uint16_t frequence	=	1/((float)peroid/100000);
- //uint16_t fre=1000000/peroid;
 TIM_OCInitTypeDef	TIM_OCSet;
 void PWM_GPIO_INIT(void)
 {
