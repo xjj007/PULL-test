@@ -63,8 +63,7 @@ typedef struct	output_data{	    //输出显示预览
 	
 }output_data;
 
- 
-
+extern uint16_t Average_Result[e_average_num];//均值滤波结果
 
 void Low_Pass_init(void);
 void LOWPASS(void);

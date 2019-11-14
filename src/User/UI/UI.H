@@ -39,6 +39,16 @@ enum mode
 	
 };
 
+typedef struct	
+{
+	int couser;		//光标位置
+	int	Page;		//页面编号 
+	int OlPage;		//当前页面，这种方式并不好
+	bool modify;	//修改模式
+}_sysUI;
+
+extern 	_sysUI SYSUI;
+
 void UIinit(void);
 void power_on(void);
 void show_function(void);

@@ -51,27 +51,29 @@ extern bool oledFresh;
 */
 struct					//此结构体下时间单位为ms
 {
-	u32 delay;			//ms级延时，us级延时需要使用专用定时器
-	
-	u32 OledRefreshTaskRemainTime;		//任务剩余时间
-	u32 OLedRefreshTaskPerTime;			//任务预设时间
-	void (*OledRefreshTask)(void);		//函数指针
-	
+	volatile int delay;			//ms级延时，us级延时需要使用专用定时器
+	volatile u32 OledRefreshTaskRemainTime;		//任务剩余时间
+	volatile u32 OLedRefreshTaskPerTime;			//任务预设时间
+	volatile void (*OledRefreshTask)(void);		//函数指针
+	volatile bool OLED_Trig;
+    
 	/*按键扫描*/
-	u32 KeyScanRemain;
-	u32 KeyScanPer;
-	void (*KeyScanTask)(void);
+	volatile u32 KeyScanRemain;
+	volatile u32 KeyScanPer;
+	volatile void (*KeyScanTask)(void);
+    volatile bool KeyScan_Trig;
 	
-	u32 USARTransmitRemain;
-	u32 USARTranmitPer;
-	void (*USARTranmit)(void);
+	volatile u32 USARTransmitRemain;
+	volatile u32 USARTranmitPer;
+	volatile void (*USARTranmit)(void);
+	volatile bool USARTransmin_Trig;
+    
+	volatile u32 TemperautreRemain;              //不需要函数指针，直接调用
+	volatile u32 TemperaturePer;
+	volatile bool Temperature_Trig;
 	
-	u32 TemperautreRemain;              //不需要函数指针，直接调用
-	u32 TemperaturePer;
-	
-	
-	u32 FliterFPS;				//滤波器帧率计算
-	u32 FliterFPSCounter;		//
+	volatile u32 FliterFPS;				//滤波器帧率计算
+	volatile u32 FliterFPSCounter;		//
 
 }Tick;
 static  uint32_t SysTickConfig(uint32_t ticks);
@@ -83,21 +85,25 @@ void TaskInit()
 	Tick.OLedRefreshTaskPerTime	    =	FPS(OLED_FPS);
 	Tick.OledRefreshTaskRemainTime	=	Tick.OLedRefreshTaskPerTime;
 	Tick.OledRefreshTask	        =	&OLED_Refresh;
-	
+	Tick.OLED_Trig                  =   false;
+    
 	Tick.KeyScanPer	    =	FPS(100);//按键扫描速度
 	Tick.KeyScanRemain	=	Tick.KeyScanPer;
 	Tick.KeyScanTask	=	&ScanKey;
-	
+	Tick.KeyScan_Trig   =   false;
+    
 	Tick.USARTranmitPer	    =	FPS(100);//刷新速度
 	Tick.USARTransmitRemain	=	Tick.USARTranmitPer;
 	Tick.USARTranmit	    =	&ANO_TransmitCallBack;
-	
-	Tick.TemperaturePer	=	FPS(10);
-	Tick.TemperautreRemain=Tick.TemperaturePer;
-	
-	Tick.FliterFPS	=	0;
-	Tick.FliterFPSCounter=0;
-
+	Tick.USARTransmin_Trig  =   false;
+    
+	Tick.TemperaturePer	    =	FPS(10);
+	Tick.TemperautreRemain  =   Tick.TemperaturePer;
+	Tick.Temperature_Trig   =   false;
+    
+	Tick.FliterFPS	        =	0;//滤波器滤波频率采样结果
+	Tick.FliterFPSCounter   =   0;//滤波器滤波次数计数器
+    
 }
 
 
@@ -111,6 +117,7 @@ void dispatcher_set()
 /*
 调度程序
 注意：不要将具体的执行函数放在中断中，否则会严重影响中断的执行速度
+此函数内的所有内容需要在1ms内执行完毕
 造成中断溢出
 通用任务的执行放在主循环中
 */
@@ -118,51 +125,60 @@ void dispatcher(void)
 {		
 	ANO.clock++;//应该赋予这个变量更正式的名字
 	sys_time++;//系统时间（ms）
-	/*每100ms读下电机的转速*/
+	
+    /*每100ms读下电机的转速*/
 	if(ANO.clock%100==0)
 	{
 	rmp	=	get_rmp()*10/2;//这个算法需要优化
 	}
-	if(ANO.clock==1000)
-	{	
-		
+	
+    if(ANO.clock==1000)//帧数计算
+	{		
 		ANO.clock=0;
 		Tick.FliterFPS= Tick.FliterFPSCounter;
 		Tick.FliterFPSCounter	=	0;
 	}
-	if(Tick.delay>0 )
-        Tick.delay--;
-	
+	if(Tick.delay)
+     Tick.delay--;
 	/*刷新温度*/
+    
 	if(Tick.TemperautreRemain >0)Tick.TemperautreRemain--;
-	else Tick.TemperautreRemain=Tick.TemperaturePer;
-	
+    
+	else   
+        {
+            Tick.TemperautreRemain=Tick.TemperaturePer;
+            Tick.Temperature_Trig   =   true;
+        }	
 	if(Tick.OledRefreshTaskRemainTime>0) Tick.OledRefreshTaskRemainTime--;
 	else
-	Tick.OledRefreshTaskRemainTime=Tick.OLedRefreshTaskPerTime;
-	
-	
+    {
+        Tick.OledRefreshTaskRemainTime=Tick.OLedRefreshTaskPerTime;
+        Tick.OLED_Trig  =   true;
+	}
 	if(Tick.USARTransmitRemain>0)Tick.USARTransmitRemain--;
 	else
+    {
 		Tick.USARTransmitRemain=Tick.USARTranmitPer;
-    
+        Tick.USARTransmin_Trig  =   true;
+    }
     if(Tick.KeyScanRemain>0)Tick.KeyScanRemain--;
-    else Tick.KeyScanRemain=Tick.KeyScanPer;
-	
+    else 
+    {    
+        Tick.KeyScanRemain=Tick.KeyScanPer;
+        Tick.KeyScan_Trig   =   true;
+    }
 }
 
 /*
 来不及触发的Task会被覆盖
 滤波次数尽可能的多，数据才能稳
+不加任务执行标志只有1ms 的任务时间
 */
 void dispatcherMain()
 {	
 	/*
 	滤波器无条件运行
 	*/
-    /*
-    目前的队列压力已经比较大了，需要开始优化程序
-    */
 	
 	Tick.FliterFPSCounter++;
 	LOWPASS();
@@ -173,40 +189,44 @@ void dispatcherMain()
 	
 	PWM1_Out_H(data.throttle);
     
-	if(Tick.KeyScanRemain==Tick.KeyScanPer)
-        (*Tick.KeyScanTask)();
     
-	if(Tick.TemperautreRemain==Tick.TemperaturePer)
-	{
-		data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //远端温度
+	if(Tick.KeyScan_Trig)
+    {   
+        Tick.KeyScan_Trig   =   false;
+        (*Tick.KeyScanTask)();
+    }
+    
+	if(Tick.Temperature_Trig)
+	{   Tick.Temperature_Trig   =   false;
+		data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15;    //远端温度
 		data.tempture1	=	Read_MLX_IIC_Data(0x06)*0.02-273.15;	//探头本身温度
 	}
 	
-	if(oledFresh && (Tick.OledRefreshTaskRemainTime==Tick.OLedRefreshTaskPerTime) )
-	(*Tick.OledRefreshTask)();
-	
-	if(Tick.USARTransmitRemain==Tick.USARTranmitPer )
+	if(oledFresh && Tick.OLED_Trig)
+    {   
+        Tick.OLED_Trig  =   false;
+        (*Tick.OledRefreshTask)();
+	}
+    
+	if(Tick.USARTransmin_Trig )
+    {
+        Tick.USARTransmin_Trig  =   false;
 		(*Tick.USARTranmit)();	//发送数据
-	/ 
+    }
+
+/*
     
-    
-    if(upKey())
-        set_beep_fre_vol(3000,10);
-    if(downKey())
-        set_beep_fre_vol(6000,10);
-    if(leftKey())
-        set_beep_fre_vol(1200,10);
-    if(rightKey())
-        set_beep_fre_vol(2400,10);
-	
-	
+    */
+      set_beep_fre_vol((key_vaule(Average_Result[A_KEY]))*2000,10);	
 	
 }
+
+
+
 
 void delay_ms(uint32_t ms)
 {
 	Tick.delay	=	ms;
-
 	while(Tick.delay);
 }
 
@@ -221,8 +241,8 @@ static  uint32_t SysTickConfig(uint32_t ticks)
   NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Cortex-M0 System Interrupts */
   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
   SysTick->CTRL  =		SysTick_CTRL_TICKINT_Msk   |							//启动sysTick
-										SysTick_CTRL_CLKSOURCE_Msk|							//	AHB时钟
-										SysTick_CTRL_ENABLE_Msk;					
+						SysTick_CTRL_CLKSOURCE_Msk |							//	AHB时钟
+						SysTick_CTRL_ENABLE_Msk;					
   return 0;       																						/* Function successful */
 }
 

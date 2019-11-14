@@ -10,6 +10,7 @@
 #include	"flash.h"
 #include	"dispatcher.h"
 
+
 extern uint8_t  key_vaule_buff;
 extern uint16_t ADC_Fliter[4];
 extern uint16_t ADC_sourse[4];
@@ -34,13 +35,9 @@ uint16_t step=10,step_t=500;//每步长度
 /*
 最简单的办法，给每个页面加上标号，按键操作通过枚举实现
 */
-struct	_sysUI
-{
-	int couser;		//光标位置
-	int	Page;		//页面编号 
-	int OlPage;		//当前页面，这种方式并不好
-	bool modify;	//修改模式
-}SYSUI;
+
+
+_sysUI SYSUI;
 
 
 #ifdef USE_EPD
@@ -269,7 +266,7 @@ void OLED_Refresh()
 	{
 		case 0:
 		power_on();//上电开机页
-        if(sys_time>1500)
+        if(sys_time>2500)
         {
             SYSUI.Page=1;  //1.5s后开机跳转
             OLED_Clear();   //跳转前清屏
@@ -293,7 +290,7 @@ void OLED_Refresh()
 +------------+
 | 拉力测试台 |
 |POWER BY XJJ|
-+------------+
++------------+ 
 */
 void power_on()
 {	
@@ -901,7 +898,14 @@ void PWM_OutPut()
 	}
 }
 
-
+/*
++----------------+
+|自动测试        |
+|手动测试        |
+|信号输出        |
+|系统设置        |
++----------------+
+*/
 void page0()
 {
 	OLED_Clear();
@@ -914,6 +918,14 @@ void page0()
 	uint8_t CN3[]={系 统 设 置 '\0'};
 	show_CN(8,48,CN3,&FontCN16,COLOR);
 }
+/*
++----------------+
+|步进          10|
+|步时          20|
+|                |
+|          NEXT—>|
++----------------+
+*/
 void page1()
 {
 	OLED_Clear();
@@ -948,6 +960,14 @@ void page2()
 	show_string(64,48,"Q:    ",&Font8X16,COLOR);
 
 }
+/*
++----------------+
+|请手动校准      |
+|                |
+|                |
+|<<        next>>|
++----------------+
+*/
 void page3()
 {	
 	OLED_Clear();//校准模式，请谨慎操作
@@ -957,6 +977,14 @@ void page3()
 	show_string(0,48,"<<",&Font8X16,COLOR);	
 
 }
+/*
++----------------+
+|                |
+|   校准电调?    |
+|                |
+|<<    *   skip>>|
++----------------+
+*/
 void page4()
 {
 	OLED_Clear();
@@ -967,11 +995,27 @@ void page4()
 	show_string(50,48,"*",&Font8X16,COLOR); 
 	show_string(0,48,"<<",&Font8X16,COLOR);	
 }
+/*
++----------------+
+|                |
+|   be careful!! |
+|                |
+|                |
++----------------+
+*/
 void page5()
 {
 	OLED_Clear();
 	show_string(20,8,"be careful!!",&Font8X16,COLOR);
 }
+/*
++----------------+
+|PWM_out_mode    |
+|Fre:            |
+|thr:            |
+|                |
++----------------+
+*/
 void page6()
 {
 	OLED_Clear();
@@ -979,6 +1023,14 @@ void page6()
 	show_string(0,16,"Fre:",&Font8X16,COLOR);
 	show_string(0,32,"thr:",&Font8X16,COLOR);
 }
+/*
++----------------+
+|步进          10|
+|步时          20|
+|频率          50|
+|蓝牙速率  115200|
++----------------+
+*/
 void page7()
 {
 	OLED_Clear();
@@ -998,8 +1050,7 @@ void page7()
 	show_CN(0,48,CN3,&FontCN16,COLOR);
 	show_uint32(70,48,USART1_Rate,6,&Font8X16,COLOR);
 	
-	draw_SolidRectangle(122,0,128,64,white);
-	draw_SolidRectangle(123,2,127,15,black);
+	 
 }
 
 void page8()

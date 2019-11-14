@@ -226,7 +226,7 @@ void OLED_Init(void)
 
 
 /*
-再屏幕的 任意位置显示字符
+再屏幕的任意位置显示字符
 x:0-63
 y:0-127
 */				
@@ -398,7 +398,7 @@ void draw_SolidRectangle(u8 x,u8 y,u8 Xend,u8 Yend,u8 Color)
 	{
 		word_catch=0;		
 			for(uint8_t i= row;i>0;i--)
-			{			//从字库取数据
+			{	//从字库取数据
 				BYTE(word_catch,i-1)=Color;	//写入颜色数据
 			}
 			word_catch<<=offset_y;
@@ -435,8 +435,6 @@ void draw_SolidRectangle(u8 x,u8 y,u8 Xend,u8 Yend,u8 Color)
 if(y>7)return;
 			}
 	return;	
-	
-
 }
 //画水平线
 void Paint_DrawHorizontalLine(u8 x,u8 y,u8 length)

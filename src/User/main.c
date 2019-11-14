@@ -19,37 +19,10 @@
 #include  "temperature.h"
 #include  "beep.h"
 
-/*
 
-*/
-/*
-电池保护策略：
-只低压报警，不干扰输出
-*/
-
-/*
-过热保护策略：
-两个阈值：
-第一个阈值降低到当前输出的50%
-
-第二个阈值立即关闭动力
-
-*/
-
-/*
-过流保护策略：
-
-
-电流因为其均值滤波比较大，所以响应会慢，只能作为一个击穿后的
-防止继续短路导致燃烧
-事实上如果真的已经发生了电调烧毁或者电机烧毁
-过流保护是没有用的，单片机无法关断主供电
-因此不设计电流保护
-*/
 
 //所有的功能开关在dispatcher.h里
-//内存不太够啊
-//要不然加个flash
+
 //OLED 要打印出完整的数据，并且最好能做个示波器出来
 //示波器模式：选择信号源，选择DIV，
 uint8_t paint[1024]={0};	//7行128列
@@ -58,6 +31,8 @@ extern uint16_t ADC_Fliter[4];
 extern uint8_t key_vaule_buff;
 extern uint16_t current_offset;//电流计偏移量
 extern all_data data;
+void  sys_init(void);
+
 int main()
 {	
 	
@@ -89,9 +64,14 @@ int main()
 	USART_config();
 	TaskInit();
 	MLX90614_Init();
-	
-	/*现在OLED不显示*/
-	
+    
+    for(u16 i=5000;i;i--)
+    {
+     LOWPASS();
+     parameter_cuc();
+    }
+	sys_init();
+   
 	while(1)
 	{
 		dispatcherMain();
@@ -105,6 +85,41 @@ void  sys_init()
 {	
 	
 	u8 bat_cells	=	 bettery_cells_check();
+    OLED_Refresh();
+    for(u8 i=bat_cells;i;i--)
+    {
+    set_beep_fre_vol(1000,10);
+    delay_ms(200);
+    set_beep_fre_vol(0,10);
+    delay_ms(100);
+    }
+    
+    set_beep_fre_vol(4000,10);
+    delay_ms(600);
+    set_beep_fre_vol(0,10);
+    SYSUI.Page=1;  //1.5s后开机跳转
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

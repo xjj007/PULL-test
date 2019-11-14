@@ -84,5 +84,6 @@ void voltage_calibration(int offset);
 void current_calibrater(void);
 uint8_t getkey(void);
 uint8_t getK(void);
-u8 bettery_cells_check();
+u8 bettery_cells_check(void);
+u8 key_vaule( u16 data);
 #endif	/*ADC_H*/

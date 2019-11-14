@@ -91,8 +91,11 @@ void Average()
 
 void ScanKey()
 {
-    if(Average_Result[A_KEY]<1269) return ;
-    
+    if(Average_Result[A_KEY]<1269) 
+    {
+       
+        return ;
+    }    
     if(Average_Result[A_KEY]<1847)
     {
         upKeyPress=true;
@@ -108,8 +111,8 @@ void ScanKey()
         leftKeyPress=true;
         return ;
     }
-    RightKeyPress=true;
-    return ;
+        RightKeyPress=true;
+        return ;
 }
 /*
 这个需要写4个吗
@@ -172,7 +175,6 @@ bool rightKey()
 //==================================//
 void LOWPASS(void)
 {
-	uint8_t	i=0;
 	Average();
 	
 	ADC_Fliter[poten]=a_parameter[a_poten]*((float)Average_Result[A_poten])
@@ -212,7 +214,7 @@ void parameter_cuc(void)
 	if(data.throttle>4000)data.throttle=4000;	//限幅
 	//data.tempture0	=	Read_MLX_IIC_Data(0x07)*0.02-273.15; //这个公式是抄的，
 	//data.tempture1	=	0;//Read_MLX_IIC_Data(0x06);;//数据源
-	data.rmp		=	Average_Result[KEY];//rmp;
+	data.rmp		=rmp;
 }
 
 
